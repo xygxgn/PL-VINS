@@ -1,3 +1,50 @@
+## ROS Noetic version of PL-VINS.
+
+### Prerequisites
+- **System**
+  - Ubuntu 20.04
+  - ROS Noetic
+- **Libraries**
+  - [OpenCV 4.6.0 with opencv_contrib 4.6.0](https://blog.csdn.net/qq_44998513/article/details/133778446)
+  - [Ceres Solver-1.14.0](http://ceres-solver.org/installation.html)
+
+### Build
+- **download the source package**
+  - `mkdir ~/catkin_ws/src && cd ~/catkin_ws/src`
+  - `git clone https://github.com/xygxgn/PL-VINS.git`
+  - `cd PL-VINS`
+- **build with OpenCV installed by yourself *(install in `/usr/local`)***
+  - `gedit camera_model/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - `gedit feature_tracker/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - `gedit image_node_b/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - `gedit pose_graph/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - `gedit sim_data_pub/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - `gedit vins_estimator/CMakeLists.txt`
+  - Modify `set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")`
+  - *do NOT forget source your own cv_bridge workspace*
+  - `source ~/cv_bridge/devel/setup.bash`
+  - `cd ~/catkin_ws/src`
+  - `catkin_make`
+
+- **Notes**
+  - ***The version of the OpenCV must be consistent with the version of OpenCV used by cv-bridge***
+
+### Run
+- **download the source package**
+  - `cd ~/catkin_ws`
+  - `source devel/setup.bash`
+  - `roslaunch plvins_estimator plvins.launch`
+- **play rosbag**
+  - `rosbag play MH_01_easy.bag`
+
+If you find this work useful or interesting, please kindly give us a star :star:, thanks!
+
+
 # PL-VINS: Real-Time Monocular Visual-Inertial SLAM with Point and Line Features
 
 [PL-VINS](https://arxiv.org/pdf/2009.07462.pdf) can yield higher accuracy than VINS-Mono (2018 IROS best Paper, TRO Honorable Mention Best Paper) at the same run rate on a low-power CPU Intel Core i7-10710U @1.10 GHz. 
