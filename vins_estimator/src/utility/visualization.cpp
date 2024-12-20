@@ -111,6 +111,15 @@ void printStatistics(const Estimator &estimator, double t)
 void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Eigen::Vector3d loop_correct_t,
                 Eigen::Matrix3d loop_correct_r)
 {
+    if (estimator.solver_flag == Estimator::SolverFlag::INITIAL)
+    {
+        ofstream foutC("/home/lilabws001/exam_ws/plvins/src/PL-VINS/output/result.txt", ios::out);
+        foutC << "#timestamp(s) tx ty tz qx qy qz qw" << std::endl;
+        foutC.close();
+    }
+
+
+
     if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR)
     {
         nav_msgs::Odometry odometry;
@@ -160,35 +169,33 @@ void pubOdometry(const Estimator &estimator, const std_msgs::Header &header, Eig
         relo_path.poses.push_back(pose_stamped);
         pub_relo_path.publish(relo_path);
 
-        ofstream foutC("/home/healer/catkin_PLVINS/src/PL-VINS/Trajactory/tum_fast_no_loop.txt", ios::app);
-        foutC.setf(ios::fixed, ios::floatfield);
-        foutC.precision(0);
-        foutC << header.stamp.toSec() * 1e9<< " ";
-        foutC.precision(5);
-        foutC << correct_t.x() << " "
-              << correct_t.y() << " "
-              << correct_t.z() << " "
-              << correct_q.w() << " "
-              << correct_q.x() << " "
-              << correct_q.y() << " "
-              << correct_q.z() <<endl;
-        foutC.close();
+        // ofstream foutC("/home/healer/catkin_PLVINS/src/PL-VINS/Trajactory/tum_fast_no_loop.txt", ios::app);
+        // foutC.setf(ios::fixed, ios::floatfield);
+        // foutC.precision(0);
+        // foutC << header.stamp.toSec() * 1e9<< " ";
+        // foutC.precision(5);
+        // foutC << correct_t.x() << " "
+        //       << correct_t.y() << " "
+        //       << correct_t.z() << " "
+        //       << correct_q.w() << " "
+        //       << correct_q.x() << " "
+        //       << correct_q.y() << " "
+        //       << correct_q.z() << endl;
+        // foutC.close();
 
-        ofstream foutC1("/home/healer/catkin_PLVINS/src/PL-VINS/Trajactory/evo_fast_no_loop.txt", ios::app);
+        // ofstream foutC1("/home/healer/catkin_PLVINS/src/PL-VINS/Trajactory/evo_fast_no_loop.txt", ios::app);
+        static ofstream foutC1("/home/lilabws001/exam_ws/plvins/src/PL-VINS/output/result.txt", ios::app);
         foutC1.setf(ios::fixed, ios::floatfield);
         foutC1.precision(9);
         foutC1 << header.stamp.toSec() << " ";
         foutC1.precision(5);
-        foutC1 << correct_t.x() << " "
-              << correct_t.y() << " "
-              << correct_t.z() << " "
-              << correct_q.x() << " "
-              << correct_q.y() << " "
-              << correct_q.z() << " "
-              << correct_q.w() <<endl;
-
-        foutC1.close();
-
+        foutC1 << estimator.Ps[WINDOW_SIZE].x() << " "
+               << estimator.Ps[WINDOW_SIZE].y() << " "
+               << estimator.Ps[WINDOW_SIZE].z() << " "
+               << tmp_Q.x() << " "
+               << tmp_Q.y() << " "
+               << tmp_Q.z() << " "
+               << tmp_Q.w() << endl;
     }
 }
 
@@ -468,10 +475,12 @@ void pubLinesCloud(const Estimator &estimator, const std_msgs::Header &header, E
 
     //static int key_poses_id = 0;
     //marg_lines_cloud.id = 0; //key_poses_id++;
-    marg_lines_cloud.scale.x = 0.05;
-    marg_lines_cloud.scale.y = 0.05;
-    marg_lines_cloud.scale.z = 0.05;
+    marg_lines_cloud.scale.x = 0.025;
+    marg_lines_cloud.scale.y = 0.025;
+    marg_lines_cloud.scale.z = 0.025;
     marg_lines_cloud.color.r = 1.0;
+    marg_lines_cloud.color.g = 0.0;
+    marg_lines_cloud.color.b = 0.0;
     marg_lines_cloud.color.a = 1.0;
     for (auto &it_per_id : estimator.f_manager.linefeature)
     {
